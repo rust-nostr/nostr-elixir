@@ -44,7 +44,7 @@ defmodule NostrElixir.MixProject do
 
   defp package do
     [
-      name: "nostr-elixir",
+      name: "nostr_elixir",
       files: ~w(lib native mix.exs README.md LICENSE),
       licenses: ["MIT"],
       links: %{
