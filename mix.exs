@@ -10,11 +10,11 @@ defmodule NostrElixir.MixProject do
       deps: deps(),
       description: description(),
       package: package(),
-      source_url: "https://github.com/your-username/nostr_elixir",
+      source_url: "https://github.com/rust-nostr/nostr-elixir",
       docs: [
         main: "readme",
         extras: ["README.md"],
-        source_url: "https://github.com/your-username/nostr_elixir"
+        source_url: "https://github.com/rust-nostr/nostr-elixir"
       ]
     ]
   end
@@ -27,7 +27,7 @@ defmodule NostrElixir.MixProject do
 
   defp deps do
     [
-      {:rustler, "~> 0.32.0"},
+      {:rustler, "~> 0.36.2"},
       {:jason, "~> 1.4"},
       {:toml, "~> 0.7"},
       {:ex_doc, "~> 0.29", only: :dev, runtime: false},
@@ -37,18 +37,18 @@ defmodule NostrElixir.MixProject do
 
   defp description do
     """
-    A complete Elixir wrapper for the nostr Rust library, built with Rustler for high performance.
+    An Elixir wrapper for the nostr Rust library, built with Rustler.
     Provides key management, text parsing, NIP-19 encoding/decoding, event creation, and filter management.
     """
   end
 
   defp package do
     [
-      name: "nostr_elixir",
+      name: "nostr-elixir",
       files: ~w(lib native mix.exs README.md LICENSE),
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/your-username/nostr_elixir",
+        "GitHub" => "https://github.com/rust-nostr/nostr-elixir",
         "nostr Rust Library" => "https://github.com/rust-nostr/nostr"
       }
     ]
