@@ -35,6 +35,7 @@ defmodule NostrElixir.Nip65 do
     """
     @enforce_keys [:url]
     defstruct [:url, :metadata]
+    @type t :: %__MODULE__{url: String.t(), metadata: String.t() | nil}
   end
 
   @doc """

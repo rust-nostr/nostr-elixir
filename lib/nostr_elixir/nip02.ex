@@ -32,6 +32,11 @@ defmodule NostrElixir.Nip02 do
     """
     @enforce_keys [:pubkey]
     defstruct [:pubkey, :relay_url, :alias]
+    @type t :: %__MODULE__{
+      pubkey: String.t(),
+      relay_url: String.t() | nil,
+      alias: String.t() | nil
+    }
   end
 
   @doc """
