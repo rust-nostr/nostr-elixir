@@ -122,50 +122,34 @@ fn nip10_create_text_note_reply_nif(
     Ok(event.as_json())
 }
 
-rustler::init!("Elixir.NostrElixir", [
-    keys_generate_nif,
-    keys_parse_nif,
-    keys_public_key_nif,
-    keys_secret_key_nif,
-    keys_public_key_bech32_nif,
-    keys_secret_key_bech32_nif,
-    keys_secret_key_hex_nif,
-    parser_parse_nif,
-    nip19_encode_nif,
-    nip19_decode_nif,
-    event_new_nif,
-    event_sign_nif,
-    event_verify_nif,
-    event_to_json_nif,
-    event_from_json_nif,
-    filter_new_nif,
-    filter_to_json_nif,
-    filter_from_json_nif,
-    nip06_generate_mnemonic_nif,
-    nip06_mnemonic_to_seed_nif,
-    nip06_derive_key_nif,
-    nip06_validate_mnemonic_nif,
-    nip44_encrypt_nif,
-    nip44_decrypt_nif,
-    nip57_private_zap_request_nif,
-    nip57_anonymous_zap_request_nif,
-    nip57_decrypt_sent_private_zap_message_nif,
-    nip57_decrypt_received_private_zap_message_nif,
-    nip17_encrypt_dm_nif,
-    nip17_decrypt_dm_nif,
-    nip65_create_relay_list_event_nif,
-    nip65_extract_relay_list_nif,
-    nip02_create_contact_list_event_nif,
-    nip02_extract_contacts_nif,
-    nip10_create_text_note_nif,
-    nip10_create_text_note_reply_nif,
-]);
+// Registration moved to EOF after all NIFs are defined
 
 // Helper function to convert nostr errors to rustler errors
 fn to_rustler_error<T>(result: Result<T, impl std::fmt::Display>) -> NifResult<T> {
     result.map_err(|e| rustler::Error::Term(Box::new(e.to_string())))
 }
 
+#[rustler::nif]
+fn nip04_encrypt_nif(secret_key: String, public_key: String, plaintext: String) -> NifResult<String> {
+    use nostr::nips::nip04;
+    use nostr::{SecretKey, PublicKey};
+    let sk = SecretKey::from_str(&secret_key).map_err(|e| rustler::Error::Term(Box::new(e.to_string())))?;
+    let pk = PublicKey::from_str(&public_key).map_err(|e| rustler::Error::Term(Box::new(e.to_string())))?;
+    let ciphertext = nip04::encrypt(&sk, &pk, plaintext)
+        .map_err(|e| rustler::Error::Term(Box::new(e.to_string())))?;
+    Ok(ciphertext)
+}
+
+#[rustler::nif]
+fn nip04_decrypt_nif(secret_key: String, public_key: String, payload: String) -> NifResult<String> {
+    use nostr::nips::nip04;
+    use nostr::{SecretKey, PublicKey};
+    let sk = SecretKey::from_str(&secret_key).map_err(|e| rustler::Error::Term(Box::new(e.to_string())))?;
+    let pk = PublicKey::from_str(&public_key).map_err(|e| rustler::Error::Term(Box::new(e.to_string())))?;
+    let plaintext = nip04::decrypt(&sk, &pk, payload)
+        .map_err(|e| rustler::Error::Term(Box::new(e.to_string())))?;
+    Ok(plaintext)
+}
 #[rustler::nif]
 fn keys_generate_nif() -> NifResult<String> {
     let keys = Keys::generate();
@@ -710,5 +694,46 @@ fn nip17_decrypt_dm_nif(secret_key: String, public_key: String, ciphertext: Stri
         .map_err(|e| rustler::Error::Term(Box::new(e.to_string())))?;
     Ok(plaintext)
 } 
+
+rustler::init!("Elixir.NostrElixir", [
+    keys_generate_nif,
+    keys_parse_nif,
+    keys_public_key_nif,
+    keys_secret_key_nif,
+    keys_public_key_bech32_nif,
+    keys_secret_key_bech32_nif,
+    keys_secret_key_hex_nif,
+    parser_parse_nif,
+    nip19_encode_nif,
+    nip19_decode_nif,
+    event_new_nif,
+    event_sign_nif,
+    event_verify_nif,
+    event_to_json_nif,
+    event_from_json_nif,
+    filter_new_nif,
+    filter_to_json_nif,
+    filter_from_json_nif,
+    nip06_generate_mnemonic_nif,
+    nip06_mnemonic_to_seed_nif,
+    nip06_derive_key_nif,
+    nip06_validate_mnemonic_nif,
+    nip04_encrypt_nif,
+    nip04_decrypt_nif,
+    nip44_encrypt_nif,
+    nip44_decrypt_nif,
+    nip57_private_zap_request_nif,
+    nip57_anonymous_zap_request_nif,
+    nip57_decrypt_sent_private_zap_message_nif,
+    nip57_decrypt_received_private_zap_message_nif,
+    nip17_encrypt_dm_nif,
+    nip17_decrypt_dm_nif,
+    nip65_create_relay_list_event_nif,
+    nip65_extract_relay_list_nif,
+    nip02_create_contact_list_event_nif,
+    nip02_extract_contacts_nif,
+    nip10_create_text_note_nif,
+    nip10_create_text_note_reply_nif,
+]);
 
  

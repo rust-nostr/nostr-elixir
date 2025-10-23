@@ -8,6 +8,8 @@ defmodule NostrElixir do
     * `NostrElixir.Nip19`  – NIP-19 encoding/decoding
     * `NostrElixir.Event`  – Event creation, signing, verification, helpers
     * `NostrElixir.Filter` – Filter creation and helpers
+    * `NostrElixir.Nip04`  – Encrypted DMs (NIP-04)
+    * `NostrElixir.Nip44`  – Encrypted DMs v2 (NIP-44)
 
   See the documentation for each module for details and examples.
   """
@@ -59,6 +61,8 @@ defmodule NostrElixir do
   def nip06_mnemonic_to_seed_nif(_, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip06_derive_key_nif(_, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip06_validate_mnemonic_nif(_), do: :erlang.nif_error(:nif_not_loaded)
+  def nip04_encrypt_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
+  def nip04_decrypt_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip44_encrypt_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip44_decrypt_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip57_private_zap_request_nif(_, _, _, _, _, _, _, _), do: :erlang.nif_error(:nif_not_loaded)

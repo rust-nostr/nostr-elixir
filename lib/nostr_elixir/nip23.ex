@@ -105,7 +105,7 @@ defmodule NostrElixir.Nip23 do
     Title: #{metadata.title || "Untitled"}
     #{if metadata.summary, do: "Summary: #{metadata.summary}", else: ""}
     #{if metadata.published_at, do: "Published: #{metadata.published_at}", else: ""}
-    #{if metadata.hashtags && length(metadata.hashtags) > 0, do: "Tags: #{Enum.join(metadata.hashtags, ", ")}", else: ""}
+    #{if length(metadata.hashtags) > 0, do: "Tags: #{Enum.join(metadata.hashtags, ", ")}", else: ""}
     #{if metadata.lang, do: "Language: #{metadata.lang}", else: ""}
 
     Content Preview:

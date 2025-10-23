@@ -10,6 +10,18 @@ NostrElixir is organized into logical modules for clarity and maintainability:
 - `NostrElixir.Nip19`  – NIP-19 encoding/decoding
 - `NostrElixir.Event`  – Event creation, signing, verification, helpers
 - `NostrElixir.Filter` – Filter creation and helpers
+ - `NostrElixir.Nip02`  – Contact list events (NIP-02)
+ - `NostrElixir.Nip04`  – Encrypted DMs (NIP-04)
+ - `NostrElixir.Nip06`  – HD wallet derivation (NIP-06)
+ - `NostrElixir.Nip09`  – Deletion events (NIP-09)
+ - `NostrElixir.Nip10`  – Threading and text note helpers (NIP-10)
+ - `NostrElixir.Nip17`  – Private DMs (kind 4 events)
+ - `NostrElixir.Nip19`  – NIP-19 encoding/decoding
+ - `NostrElixir.Nip23`  – Long-form content (NIP-23)
+ - `NostrElixir.Nip44`  – Encrypted DMs v2 (NIP-44)
+ - `NostrElixir.Nip57`  – Zaps (NIP-57)
+ - `NostrElixir.Nip65`  – Relay list metadata (NIP-65)
+ - `NostrElixir.Mnemonic` – Mnemonic generation and seed conversion (helpers for NIP-06)
 
 The root `NostrElixir` module provides a facade for common operations, but direct use of submodules is recommended for clarity and maintainability.
 
@@ -38,6 +50,32 @@ alias NostrElixir.Nip19
 npub = Nip19.encode("npub", "eec7245d6b7d2ccb30380bfbe2a3648cd7a942653f5aa340edcea1f283686619")
 result = Nip19.decode_map(npub)
 # %{data_type: "npub", data: ...}
+```
+
+### NIP-04 Encrypted Direct Messages
+```elixir
+alias NostrElixir.Nip04
+alias NostrElixir.Keys
+
+sender = Keys.generate_keypair()
+receiver = Keys.generate_keypair()
+
+ciphertext = Nip04.encrypt(sender.secret_key, receiver.public_key, "hello")
+plaintext = Nip04.decrypt(receiver.secret_key, sender.public_key, ciphertext)
+# "hello"
+```
+
+### NIP-44 Encrypted Direct Messages v2
+```elixir
+alias NostrElixir.Nip44
+alias NostrElixir.Keys
+
+sender = Keys.generate_keypair()
+receiver = Keys.generate_keypair()
+
+ciphertext = Nip44.encrypt(sender.secret_key, receiver.public_key, "hello")
+plaintext = Nip44.decrypt(receiver.secret_key, sender.public_key, ciphertext)
+# "hello"
 ```
 
 ### Event Creation, Signing, and Verification
