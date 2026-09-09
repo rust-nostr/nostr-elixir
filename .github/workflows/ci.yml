@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.17"
+          otp-version: "27"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+            ~/.cargo/registry
+            ~/.cargo/git
+            native/nostr_nif/target
+          key: ${{ runner.os }}-mix-${{ hashFiles('mix.lock') }}-cargo-${{ hashFiles('native/nostr_nif/Cargo.lock') }}
+
+      - run: mix deps.get
+      - run: mix test

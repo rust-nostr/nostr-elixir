@@ -7,8 +7,6 @@ deps/
 
 # Rust
 target/
-Cargo.lock
-native/*/Cargo.lock
 
 # Compiled NIF binaries (platform-specific)
 priv/native/
@@ -32,5 +30,8 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# Hex build artifacts
+*.tar
 
 nostr

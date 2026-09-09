@@ -4,12 +4,22 @@ defmodule NostrElixir do
 
   ## Modules
 
-    * `NostrElixir.Keys`   – Key management (generation, parsing, conversions)
-    * `NostrElixir.Nip19`  – NIP-19 encoding/decoding
-    * `NostrElixir.Event`  – Event creation, signing, verification, helpers
+    * `NostrElixir.Keys` – Key management (generation, parsing, conversions)
+    * `NostrElixir.Nip19` – NIP-19 encoding/decoding
+    * `NostrElixir.Nip19.Address` – NIP-19 TLV entities (`naddr`, `nevent`, `nprofile`)
+    * `NostrElixir.Event` – Event creation, signing, verification, helpers
     * `NostrElixir.Filter` – Filter creation and helpers
-    * `NostrElixir.Nip04`  – Encrypted DMs (NIP-04)
-    * `NostrElixir.Nip44`  – Encrypted DMs v2 (NIP-44)
+    * `NostrElixir.Nip02` – Follow lists (NIP-02)
+    * `NostrElixir.Nip04` – Encrypted DMs (NIP-04)
+    * `NostrElixir.Nip06` – HD wallet derivation (NIP-06)
+    * `NostrElixir.Nip09` – Deletion events (NIP-09)
+    * `NostrElixir.Nip10` – Threading and text notes (NIP-10)
+    * `NostrElixir.Nip17` – Private DMs (kind 4 events)
+    * `NostrElixir.Nip23` – Long-form content (NIP-23)
+    * `NostrElixir.Nip44` – Encrypted DMs v2 (NIP-44)
+    * `NostrElixir.Nip57` – Zaps (NIP-57)
+    * `NostrElixir.Nip65` – Relay list metadata (NIP-65)
+    * `NostrElixir.Mnemonic` – Mnemonic generation and seed conversion
 
   See the documentation for each module for details and examples.
   """
@@ -49,6 +59,10 @@ defmodule NostrElixir do
   def parser_parse_nif(_), do: :erlang.nif_error(:nif_not_loaded)
   def nip19_encode_nif(_, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip19_decode_nif(_), do: :erlang.nif_error(:nif_not_loaded)
+  def nip19_encode_naddr_nif(_, _, _, _), do: :erlang.nif_error(:nif_not_loaded)
+  def nip19_encode_nevent_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
+  def nip19_encode_nprofile_nif(_, _), do: :erlang.nif_error(:nif_not_loaded)
+  def nip19_decode_address_nif(_), do: :erlang.nif_error(:nif_not_loaded)
   def event_new_nif(_, _, _, _), do: :erlang.nif_error(:nif_not_loaded)
   def event_sign_nif(_, _), do: :erlang.nif_error(:nif_not_loaded)
   def event_verify_nif(_), do: :erlang.nif_error(:nif_not_loaded)
@@ -65,15 +79,12 @@ defmodule NostrElixir do
   def nip04_decrypt_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip44_encrypt_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip44_decrypt_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
-  def nip57_private_zap_request_nif(_, _, _, _, _, _, _, _), do: :erlang.nif_error(:nif_not_loaded)
-  def nip57_anonymous_zap_request_nif(_, _, _, _, _, _, _), do: :erlang.nif_error(:nif_not_loaded)
-  def nip57_decrypt_sent_private_zap_message_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
-  def nip57_decrypt_received_private_zap_message_nif(_, _), do: :erlang.nif_error(:nif_not_loaded)
+  def nip57_zap_request_nif(_, _, _, _, _, _, _, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip17_encrypt_dm_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
   def nip17_decrypt_dm_nif(_, _, _), do: :erlang.nif_error(:nif_not_loaded)
-  def nip65_create_relay_list_event_nif(_relays, _pubkey), do: :erlang.nif_error(:nif_not_loaded)
+  def nip65_create_relay_list_event_nif(_relays, _secret_key), do: :erlang.nif_error(:nif_not_loaded)
   def nip65_extract_relay_list_nif(_event_json), do: :erlang.nif_error(:nif_not_loaded)
-  def nip02_create_contact_list_event_nif(_contacts, _pubkey), do: :erlang.nif_error(:nif_not_loaded)
+  def nip02_create_contact_list_event_nif(_contacts, _secret_key), do: :erlang.nif_error(:nif_not_loaded)
   def nip02_extract_contacts_nif(_event_json), do: :erlang.nif_error(:nif_not_loaded)
   def nip10_create_text_note_nif(_keys_json, _content), do: :erlang.nif_error(:nif_not_loaded)
   def nip10_create_text_note_reply_nif(_keys_json, _content, _reply_to_json, _root_json, _relay_url), do: :erlang.nif_error(:nif_not_loaded)

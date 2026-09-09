@@ -2,26 +2,39 @@
 
 A complete Elixir wrapper for the [nostr](https://github.com/rust-nostr/nostr) Rust library, built with Rustler for high performance.
 
+## Requirements
+
+This package compiles a native NIF. You need:
+
+- Elixir 1.14+ (and a compatible OTP)
+- A Rust toolchain (`rustc` and `cargo`), for example via [rustup](https://rustup.rs)
+
+```elixir
+def deps do
+  [{:nostr_elixir, "~> 0.45.4"}]
+end
+```
+
 ## Modular API Structure
 
 NostrElixir is organized into logical modules for clarity and maintainability:
 
-- `NostrElixir.Keys`   – Key management (generation, parsing, conversions)
-- `NostrElixir.Nip19`  – NIP-19 encoding/decoding
-- `NostrElixir.Event`  – Event creation, signing, verification, helpers
+- `NostrElixir.Keys` – Key management (generation, parsing, conversions)
+- `NostrElixir.Nip19` – NIP-19 encoding/decoding
+- `NostrElixir.Nip19.Address` – NIP-19 TLV entities (`naddr`, `nevent`, `nprofile`)
+- `NostrElixir.Event` – Event creation, signing, verification, helpers
 - `NostrElixir.Filter` – Filter creation and helpers
- - `NostrElixir.Nip02`  – Contact list events (NIP-02)
- - `NostrElixir.Nip04`  – Encrypted DMs (NIP-04)
- - `NostrElixir.Nip06`  – HD wallet derivation (NIP-06)
- - `NostrElixir.Nip09`  – Deletion events (NIP-09)
- - `NostrElixir.Nip10`  – Threading and text note helpers (NIP-10)
- - `NostrElixir.Nip17`  – Private DMs (kind 4 events)
- - `NostrElixir.Nip19`  – NIP-19 encoding/decoding
- - `NostrElixir.Nip23`  – Long-form content (NIP-23)
- - `NostrElixir.Nip44`  – Encrypted DMs v2 (NIP-44)
- - `NostrElixir.Nip57`  – Zaps (NIP-57)
- - `NostrElixir.Nip65`  – Relay list metadata (NIP-65)
- - `NostrElixir.Mnemonic` – Mnemonic generation and seed conversion (helpers for NIP-06)
+- `NostrElixir.Nip02` – Follow list events (NIP-02)
+- `NostrElixir.Nip04` – Encrypted DMs (NIP-04)
+- `NostrElixir.Nip06` – HD wallet derivation (NIP-06)
+- `NostrElixir.Nip09` – Deletion events (NIP-09)
+- `NostrElixir.Nip10` – Threading and text note helpers (NIP-10)
+- `NostrElixir.Nip17` – Private DMs (kind 4 events)
+- `NostrElixir.Nip23` – Long-form content (NIP-23)
+- `NostrElixir.Nip44` – Encrypted DMs v2 (NIP-44)
+- `NostrElixir.Nip57` – Zaps (NIP-57)
+- `NostrElixir.Nip65` – Relay list metadata (NIP-65)
+- `NostrElixir.Mnemonic` – Mnemonic generation and seed conversion (helpers for NIP-06)
 
 The root `NostrElixir` module provides a facade for common operations, but direct use of submodules is recommended for clarity and maintainability.
 
@@ -113,11 +126,12 @@ The root `NostrElixir` module still provides delegates for the most common opera
 ## Features
 
 - Key Management: Generate, parse, and convert keys
-- NIP-19: Encode/decode bech32 addresses
+- NIP-19: Encode/decode bech32 addresses (`npub`/`nsec`/`note` and TLV `naddr`/`nevent`/`nprofile`)
 - Event Management: Create, sign, verify, and serialize events
 - Filter Management: Create filters for querying events
-- Idiomatic, modular Elixir API
-- High performance via Rust NIFs
+- Built on rust-nostr `nostr` **0.45.4** (package version kept in sync)
+
+See [CHANGELOG.md](CHANGELOG.md) for breaking changes.
 
 ## Roadmap
 
@@ -130,4 +144,3 @@ The root `NostrElixir` module still provides delegates for the most common opera
 ## License
 
 MIT
-

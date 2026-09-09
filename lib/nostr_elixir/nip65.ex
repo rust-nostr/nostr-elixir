@@ -6,24 +6,17 @@ defmodule NostrElixir.Nip65 do
 
   ## Examples
 
-      iex> relays = [
-      ...>   {"wss://relay1.example.com", "read"},
-      ...>   {"wss://relay2.example.com", "write"},
-      ...>   {"wss://relay3.example.com", nil}
-      ...> ]
-      iex> pubkey = "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
-      iex> event_json = NostrElixir.Nip65.create_relay_list_event(relays, pubkey)
-      iex> is_binary(event_json)
-      true
-      iex> NostrElixir.Nip65.extract_relay_list(event_json)
-      [
+      keys = NostrElixir.Keys.generate_keypair()
+      relays = [
         {"wss://relay1.example.com", "read"},
         {"wss://relay2.example.com", "write"},
         {"wss://relay3.example.com", nil}
       ]
+      event_json = NostrElixir.Nip65.create_relay_list_event(relays, keys.secret_key)
+      NostrElixir.Nip65.extract_relay_list(event_json)
 
   The relay list is a list of `{relay_url, metadata}` tuples, where `metadata` is either "read", "write", or `nil`.
-  The public key must be a 64-character hex string.
+  Events are signed with the author's secret key (hex, bech32, or a keys map).
   """
 
   defmodule Relay do
@@ -82,38 +75,29 @@ defmodule NostrElixir.Nip65 do
   end
 
   @doc """
-  Create a relay list event from a list of `{relay_url, metadata}` tuples and a public key.
+  Create a signed relay list event from a list of `{relay_url, metadata}` tuples.
 
   - `relays`: List of `{relay_url, metadata}` tuples. `metadata` can be "read", "write", or `nil`.
-  - `pubkey`: 64-character hex string public key.
+  - `secret_key`: Author's secret key (hex or bech32), or a keys map with `:secret_key`.
 
   Returns the event as a JSON string.
-
-  ## Example
-
-      iex> relays = [{"wss://relay.example.com", "read"}]
-      iex> pubkey = "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
-      iex> event_json = NostrElixir.Nip65.create_relay_list_event(relays, pubkey)
-      iex> is_binary(event_json)
-      true
   """
-  @spec create_relay_list_event([{String.t(), String.t() | nil}], String.t()) :: String.t()
-  def create_relay_list_event(relays, pubkey) when is_list(relays) and is_binary(pubkey) do
-    NostrElixir.nip65_create_relay_list_event_nif(relays, pubkey)
+  @spec create_relay_list_event([{String.t(), String.t() | nil}], String.t() | map()) :: String.t()
+  def create_relay_list_event(relays, %{secret_key: secret_key}) do
+    create_relay_list_event(relays, secret_key)
+  end
+
+  def create_relay_list_event(relays, secret_key) when is_list(relays) and is_binary(secret_key) do
+    case NostrElixir.nip65_create_relay_list_event_nif(relays, secret_key) do
+      {:error, reason} -> raise ArgumentError, "NIP-65 create_relay_list_event failed: #{reason}"
+      result -> result
+    end
   end
 
   @doc """
   Extract the relay list from an event JSON string.
 
   Returns a list of `{relay_url, metadata}` tuples.
-
-  ## Example
-
-      iex> event_json = NostrElixir.Nip65.create_relay_list_event([
-      ...>   {"wss://relay.example.com", "read"}
-      ...> ], "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798")
-      iex> NostrElixir.Nip65.extract_relay_list(event_json)
-      [{"wss://relay.example.com", "read"}]
   """
   @spec extract_relay_list(String.t()) :: [{String.t(), String.t() | nil}]
   def extract_relay_list(event_json) when is_binary(event_json) do

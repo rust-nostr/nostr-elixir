@@ -25,11 +25,11 @@ defmodule NostrElixir.EventTest do
     assert length(event["tags"]) > 0
   end
 
-  test "verify_event returns false for now" do
+  test "verify_event rejects unsigned events" do
     keys = Keys.generate_keypair()
     event_json = Event.new(keys.public_key, "Hello", 1, [])
 
-    assert_raise ArgumentError, ~r/malformed signature/, fn ->
+    assert_raise ArgumentError, ~r/Failed to verify event/, fn ->
       Event.verify(event_json)
     end
   end

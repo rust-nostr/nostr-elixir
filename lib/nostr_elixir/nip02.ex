@@ -6,19 +6,13 @@ defmodule NostrElixir.Nip02 do
 
   ## Examples
 
-      iex> follows = [
-      ...>   {"npub1...", "wss://relay.example.com", "Alice"},
-      ...>   {"npub2...", nil, nil}
-      ...> ]
-      iex> pubkey = "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
-      iex> event_json = NostrElixir.Nip02.create_follow_list_event(follows, pubkey)
-      iex> is_binary(event_json)
-      true
-      iex> NostrElixir.Nip02.extract_follows(event_json)
-      [
-        {"npub1...", "wss://relay.example.com", "Alice"},
-        {"npub2...", nil, nil}
+      keys = NostrElixir.Keys.generate_keypair()
+      follows = [
+        {followed_pubkey, "wss://relay.example.com", "Alice"},
+        {other_pubkey, nil, nil}
       ]
+      event_json = NostrElixir.Nip02.create_follow_list_event(follows, keys.secret_key)
+      NostrElixir.Nip02.extract_follows(event_json)
 
   The term 'contact' is used in some libraries, but the protocol and this module use 'follow' to match NIP-02.
   """
@@ -33,19 +27,32 @@ defmodule NostrElixir.Nip02 do
     @enforce_keys [:pubkey]
     defstruct [:pubkey, :relay_url, :alias]
     @type t :: %__MODULE__{
-      pubkey: String.t(),
-      relay_url: String.t() | nil,
-      alias: String.t() | nil
-    }
+            pubkey: String.t(),
+            relay_url: String.t() | nil,
+            alias: String.t() | nil
+          }
   end
 
   @doc """
-  Create a follow list event from a list of `{pubkey, relay_url, alias}` tuples and a public key.
+  Create a signed follow list event from a list of `{pubkey, relay_url, alias}` tuples.
+
+  The second argument is the author's secret key (hex or bech32) or a keys map
+  with a `:secret_key` field. The event pubkey is derived from that key.
   Returns the event as a JSON string.
   """
-  @spec create_follow_list_event([{String.t(), String.t() | nil, String.t() | nil}], String.t()) :: String.t()
-  def create_follow_list_event(follows, pubkey) when is_list(follows) and is_binary(pubkey) do
-    NostrElixir.nip02_create_contact_list_event_nif(follows, pubkey)
+  @spec create_follow_list_event(
+          [{String.t(), String.t() | nil, String.t() | nil}],
+          String.t() | map()
+        ) :: String.t()
+  def create_follow_list_event(follows, %{secret_key: secret_key}) do
+    create_follow_list_event(follows, secret_key)
+  end
+
+  def create_follow_list_event(follows, secret_key) when is_list(follows) and is_binary(secret_key) do
+    case NostrElixir.nip02_create_contact_list_event_nif(follows, secret_key) do
+      {:error, reason} -> raise ArgumentError, "NIP-02 create_follow_list_event failed: #{reason}"
+      result -> result
+    end
   end
 
   @doc """
@@ -74,7 +81,10 @@ defmodule NostrElixir.Nip02 do
   """
   @spec valid_relay_url?(String.t() | nil) :: boolean
   def valid_relay_url?(nil), do: true
-  def valid_relay_url?(url) when is_binary(url), do: String.starts_with?(url, ["ws://", "wss://"]) and String.length(url) > 8
+
+  def valid_relay_url?(url) when is_binary(url),
+    do: String.starts_with?(url, ["ws://", "wss://"]) and String.length(url) > 8
+
   def valid_relay_url?(_), do: false
 
   @doc """
@@ -93,6 +103,7 @@ defmodule NostrElixir.Nip02 do
     |> Enum.map(fn
       %Follow{pubkey: pk, relay_url: url, alias: a} ->
         "- #{pk}#{if url, do: " [#{url}]", else: ""}#{if a, do: " (#{a})", else: ""}"
+
       {pk, url, a} ->
         "- #{pk}#{if url, do: " [#{url}]", else: ""}#{if a, do: " (#{a})", else: ""}"
     end)
